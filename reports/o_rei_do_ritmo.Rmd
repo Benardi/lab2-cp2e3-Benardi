@@ -1,0 +1,74 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(here)
+theme_set(theme_bw())
+```
+
+
+```{r}
+data <- read_csv(here::here("data/jackson.csv"), 
+                            col_types = cols(
+                                .default = col_double(),
+                                album_uri = col_character(),
+                                album_name = col_character(),
+                                album_img = col_character(),
+                                album_release_date = col_character(),
+                                album_release_year = col_date(format = ""),
+                                album_popularity = col_integer(),
+                                track_name = col_character(),
+                                track_uri = col_character(),
+                                key = col_character(),
+                                mode = col_character(),
+                                time_signature = col_integer(),
+                                key_mode = col_character(),
+                                track_popularity = col_integer()
+                                ))
+data %>% 
+    glimpse()
+```
+
+```{r}
+data %>% 
+    ggplot(aes(sample=danceability)) + 
+        stat_qq()
+```
+
+```{r}
+data %>% 
+    ggplot(aes(sample=loudness)) + 
+        stat_qq()
+```
+
+```{r}
+data %>% 
+    ggplot(aes(loudness, ..density..)) +
+    geom_histogram(binwidth = 0.5,
+                   fill="grey",
+                   color="black") 
+```
+
+
+```{r}
+data %>% 
+    ggplot(aes(sample=duration_ms)) + 
+        stat_qq()
+```
+
+```{r}
+data %>% 
+    ggplot(aes(duration_ms, ..density..)) +
+    geom_histogram(binwidth = 6000,
+                   fill="grey",
+                   color="black") 
+```
+
+```{r}
+data %>% 
+    ggplot(aes(sample=speechiness)) + 
+        stat_qq()
+```
