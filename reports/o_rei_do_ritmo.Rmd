@@ -1,14 +1,25 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "EDA VIS canções"
+subtitle: 'Análise sobre Jackson do Pandeiro'
+author: "José Benardi de Souza Nunes"
+output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_float: yes
 ---
 
 ```{r}
 library(tidyverse)
 library(here)
+library(plotly)
 theme_set(theme_bw())
 ```
 
+## Data Overview
 
 ```{r}
 data <- read_csv(here::here("data/jackson.csv"), 
@@ -32,6 +43,8 @@ data %>%
     glimpse()
 ```
 
+### Danceability
+
 ```{r}
 data %>% 
     ggplot(aes(sample=danceability)) + 
@@ -40,35 +53,106 @@ data %>%
 
 ```{r}
 data %>% 
-    ggplot(aes(sample=loudness)) + 
-        stat_qq()
-```
-
-```{r}
-data %>% 
-    ggplot(aes(loudness, ..density..)) +
-    geom_histogram(binwidth = 0.5,
+    ggplot(aes(danceability, ..density..)) +
+    geom_histogram(binwidth = 0.05,
                    fill="grey",
                    color="black") 
 ```
 
-
-```{r}
-data %>% 
-    ggplot(aes(sample=duration_ms)) + 
-        stat_qq()
-```
-
-```{r}
-data %>% 
-    ggplot(aes(duration_ms, ..density..)) +
-    geom_histogram(binwidth = 6000,
-                   fill="grey",
-                   color="black") 
-```
+### Speechines
 
 ```{r}
 data %>% 
     ggplot(aes(sample=speechiness)) + 
         stat_qq()
+```
+
+```{r}
+data %>% 
+    ggplot(aes(speechiness, ..density..)) +
+    geom_histogram(binwidth = 0.1,
+                   fill="grey",
+                   color="black") 
+```
+
+### Duration
+
+```{r}
+data <- data %>%
+    mutate(duration_s = duration_ms/1000)
+
+data %>% 
+    select(duration_s) %>%
+    glimpse()
+```
+
+
+```{r}
+data %>% 
+    ggplot(aes(sample=duration_s)) + 
+        stat_qq()
+```
+
+```{r}
+data %>% 
+    ggplot(aes(duration_s, ..density..)) +
+    geom_histogram(binwidth = 60,
+                   fill="grey",
+                   color="black") 
+```
+
+## Mais discurso/diálogo (speechines) tem efeito sobre a dançabilidade da música?
+
+```{r}
+p <- data %>% 
+        group_by(track_name) %>%
+        unique() %>%
+        ggplot(aes(x=speechiness,
+                   y=danceability)) +
+        geom_point(alpha=0.4) 
+
+ggplotly(p)
+```
+
+```{r}
+data %>% 
+    group_by(track_name) %>%
+    unique() %>%
+    ggplot(aes(speechiness,danceability)) +
+    stat_density2d(aes(fill = ..level..), geom = "polygon")
+```
+
+
+
+
+
+## Como o passar dos anos afeta o tempo de duração da música?
+
+Ultimo album "1981: Isso é que é Forró!"
+
+
+```{r}
+data <- data %>%
+    mutate(remaster = album_release_date > "1981-30-12")
+```
+
+```{r}
+data %>% 
+    filter(album_release_date <= "1981-30-12") %>%
+    ggplot(aes(x=album_release_year,
+               duration_s,
+               group=album_release_year)) +
+    geom_boxplot() 
+```
+
+```{r}
+data %>% 
+    ggplot(aes(x=as.factor(album_release_year),
+               duration_s,
+               group=album_release_year,
+               color=remaster)) +
+    geom_jitter(position = position_dodge(width = 0.9),
+                alpha=0.3) +
+    geom_boxplot(outlier.colour = NA,position = "dodge", alpha=0.6) +
+    theme(axis.text.x = element_text(angle = 30, hjust = 1))
 ```
