@@ -157,18 +157,25 @@ data %>%
 ## Como o passar dos anos afeta o tempo de duração da música?
 
 ```{r}
-data %>% 
+temp <-
+    data %>% 
     distinct(album_name, .keep_all = TRUE) %>%
-    ggplot(aes(as.factor(album_release_year),
-               group=album_release_year,
-               fill=remaster)) +
-    geom_bar() +
-    theme(axis.text.x = element_text(angle = 30, hjust = 1))
-```
+    group_by(album_release_year) %>%
+    summarise(original_n = sum(!remaster),
+              remaster_n = sum(remaster))
 
-```{r}
-hchart(temp$album_release_date,
-       name="Número de albuns")
+highchart() %>%
+
+  hc_xAxis(categories = temp$album_release_year) %>%
+  hc_add_series(temp$original_n, 
+                type = "column",
+                color = "#B71C1C",
+                name = "Não remasterizado") %>%
+  hc_add_series(temp$remaster_n, 
+                type = "column",
+                name = "Remasterizado")  %>%
+      hc_title(text = "Número de álbuns por ano")
+
 ```
 
 ```{r}
