@@ -18,6 +18,7 @@ library(dplyr, warn.conflicts = FALSE)
 library(here)
 library(plotly)
 library(highcharter)
+library(stringr)
 theme_set(theme_bw())
 ```
 
@@ -40,7 +41,10 @@ data <- read_csv(here::here("data/jackson.csv"),
                                 time_signature = col_integer(),
                                 key_mode = col_character(),
                                 track_popularity = col_integer()
-                                ))
+                                )) %>%
+         mutate(album_name = gsub(".*(1954).*",
+                                         "The Music of Brazil/Jackson do Pandeiro",
+                                  album_name));
 data %>% 
     glimpse()
 ```
@@ -54,13 +58,11 @@ data %>%
 ```
 
 ```{r}
-data %>% 
-    ggplot(aes(danceability, ..density..)) +
-    geom_histogram(binwidth = 0.05,
-                   fill="grey",
-                   color="black") +
-    scale_x_continuous(breaks=seq(0,1,0.05)) 
+hchart (data$danceability,
+        color = "#B71C1C",
+        name = "Dançabilidade")
 ```
+
 
 ### Speechines
 
@@ -71,13 +73,9 @@ data %>%
 ```
 
 ```{r}
-data %>% 
-    ggplot(aes(speechiness, ..density..)) +
-    geom_histogram(binwidth = 0.1,
-                   fill="grey",
-                   color="black") +
-    scale_x_continuous(breaks=seq(-0.05,1,0.1)) 
-
+hchart (data$speechiness,
+        color = "#B71C1C",
+        name = "Verbosidade")
 ```
 
 ### Duration
@@ -99,20 +97,43 @@ data %>%
 ```
 
 ```{r}
-data %>% 
-    ggplot(aes(duration_s, ..density..)) +
-    geom_histogram(binwidth = 15,
-                   fill="grey",
-                   color="black") +
-    scale_x_continuous(breaks=seq(0,300,10)) 
+hchart (data$duration_s,
+        color = "#B71C1C",
+        name = "Duração (s)")
 ```
+
+### Remaster
+
+Ultimo album "1981: Isso é que é Forró!"
+
+```{r}
+data <- data %>%
+    mutate(remaster = album_release_date > "1981-30-12")
+
+data %>% 
+    select(album_name, album_release_year, remaster) %>%
+    sample_n(10)
+```
+
+
+```{r}
+temp <- data %>% 
+    distinct(album_name,
+             .keep_all = TRUE) %>%
+    mutate(remaster = ifelse(remaster == TRUE,"remasterizado","original"))
+
+hchart(temp$remaster,
+       colorByPoint = TRUE,
+       name="Álbum")
+```
+
+
 
 ## Mais discurso/diálogo (speechines) tem efeito sobre a dançabilidade da música?
 
 ```{r}
 p <- data %>% 
-        group_by(track_name) %>%
-        unique() %>%
+        distinct(track_name, .keep_all = TRUE) %>%
         ggplot(aes(x=speechiness,
                    y=danceability)) +
         geom_point(alpha=0.4) 
@@ -122,8 +143,7 @@ ggplotly(p)
 
 ```{r}
 data %>% 
-    group_by(track_name) %>%
-    unique() %>%
+    distinct(track_name, .keep_all = TRUE) %>%
     ggplot(aes(speechiness,danceability)) +
     stat_density2d(aes(fill = ..level..), geom = "polygon")
 ```
@@ -136,12 +156,19 @@ data %>%
 
 ## Como o passar dos anos afeta o tempo de duração da música?
 
-Ultimo album "1981: Isso é que é Forró!"
-
+```{r}
+data %>% 
+    distinct(album_name, .keep_all = TRUE) %>%
+    ggplot(aes(as.factor(album_release_year),
+               group=album_release_year,
+               fill=remaster)) +
+    geom_bar() +
+    theme(axis.text.x = element_text(angle = 30, hjust = 1))
+```
 
 ```{r}
-data <- data %>%
-    mutate(remaster = album_release_date > "1981-30-12")
+hchart(temp$album_release_date,
+       name="Número de albuns")
 ```
 
 ```{r}
@@ -150,33 +177,30 @@ data %>%
                duration_s,
                group=album_release_year,
                color=remaster)) +
-    geom_jitter(position = position_dodge(width = 0.9),
-                alpha=0.3) +
-    geom_boxplot(outlier.colour = NA,position = "dodge", alpha=0.6) +
+    geom_boxplot(position = "dodge", alpha=0.6) +
     theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
 ```
 
-#### Os albuns lançados mais recentemente (relançamentos/remasterizados) são mais populares? 
+## Os albuns relançados/remasterizados são mais populares? 
 
 ```{r}
 # lollipop chart
 m <- list(
-  l = 505)
+  l = 370)
 
 p <- data %>%
-        ggplot(aes(album_popularity,y=reorder(album_name,album_popularity),color=remaster)) +
+        ggplot(aes(album_popularity,y=reorder(album_name,album_popularity),
+                   color=remaster,
+                   group=remaster)) +
             geom_segment(aes(x = 0, y = reorder(album_name,album_popularity), 
                              xend = album_popularity, 
-                             yend = album_name),
-                         color = "grey50") + 
+                             yend = album_name)) + 
         geom_point() +
         theme(axis.title.y=element_blank())
 
 ggplotly(p) %>%
   layout(autosize = F,
-         margin = m,
-         height=600,
-         width=800)
+         margin = m)
 ```
 
