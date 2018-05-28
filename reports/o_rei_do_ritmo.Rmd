@@ -14,8 +14,10 @@ output:
 
 ```{r}
 library(tidyverse)
+library(dplyr, warn.conflicts = FALSE)
 library(here)
 library(plotly)
+library(highcharter)
 theme_set(theme_bw())
 ```
 
@@ -56,7 +58,8 @@ data %>%
     ggplot(aes(danceability, ..density..)) +
     geom_histogram(binwidth = 0.05,
                    fill="grey",
-                   color="black") 
+                   color="black") +
+    scale_x_continuous(breaks=seq(0,1,0.05)) 
 ```
 
 ### Speechines
@@ -72,7 +75,9 @@ data %>%
     ggplot(aes(speechiness, ..density..)) +
     geom_histogram(binwidth = 0.1,
                    fill="grey",
-                   color="black") 
+                   color="black") +
+    scale_x_continuous(breaks=seq(-0.05,1,0.1)) 
+
 ```
 
 ### Duration
@@ -96,9 +101,10 @@ data %>%
 ```{r}
 data %>% 
     ggplot(aes(duration_s, ..density..)) +
-    geom_histogram(binwidth = 60,
+    geom_histogram(binwidth = 15,
                    fill="grey",
-                   color="black") 
+                   color="black") +
+    scale_x_continuous(breaks=seq(0,300,10)) 
 ```
 
 ## Mais discurso/diálogo (speechines) tem efeito sobre a dançabilidade da música?
@@ -122,9 +128,11 @@ data %>%
     stat_density2d(aes(fill = ..level..), geom = "polygon")
 ```
 
-
-
-
+```{r}
+data %>%
+    group_by(track_name) %>%
+    top_n(10, speechiness)
+```
 
 ## Como o passar dos anos afeta o tempo de duração da música?
 
@@ -138,15 +146,6 @@ data <- data %>%
 
 ```{r}
 data %>% 
-    filter(album_release_date <= "1981-30-12") %>%
-    ggplot(aes(x=album_release_year,
-               duration_s,
-               group=album_release_year)) +
-    geom_boxplot() 
-```
-
-```{r}
-data %>% 
     ggplot(aes(x=as.factor(album_release_year),
                duration_s,
                group=album_release_year,
@@ -155,4 +154,29 @@ data %>%
                 alpha=0.3) +
     geom_boxplot(outlier.colour = NA,position = "dodge", alpha=0.6) +
     theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
 ```
+
+#### Os albuns lançados mais recentemente (relançamentos/remasterizados) são mais populares? 
+
+```{r}
+# lollipop chart
+m <- list(
+  l = 505)
+
+p <- data %>%
+        ggplot(aes(album_popularity,y=reorder(album_name,album_popularity),color=remaster)) +
+            geom_segment(aes(x = 0, y = reorder(album_name,album_popularity), 
+                             xend = album_popularity, 
+                             yend = album_name),
+                         color = "grey50") + 
+        geom_point() +
+        theme(axis.title.y=element_blank())
+
+ggplotly(p) %>%
+  layout(autosize = F,
+         margin = m,
+         height=600,
+         width=800)
+```
+
