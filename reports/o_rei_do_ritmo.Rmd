@@ -17,6 +17,7 @@ library(tidyverse)
 library(dplyr, warn.conflicts = FALSE)
 library(here)
 library(plotly)
+library(scales)
 library(highcharter)
 library(stringr)
 theme_set(theme_bw())
@@ -141,6 +142,8 @@ p <- data %>%
 ggplotly(p)
 ```
 
+A dançabilidade das músicas de Jackson
+
 ```{r}
 data %>% 
     distinct(track_name, .keep_all = TRUE) %>%
@@ -179,7 +182,11 @@ highchart() %>%
 ```
 
 ```{r}
-data %>% 
+m <- list(
+  l =70,
+  b = 150)
+
+p <- data %>% 
     ggplot(aes(x=as.factor(album_release_year),
                duration_s,
                group=album_release_year,
@@ -187,6 +194,8 @@ data %>%
     geom_boxplot(position = "dodge", alpha=0.6) +
     theme(axis.text.x = element_text(angle = 30, hjust = 1))
 
+ggplotly(p) %>%
+     layout(autosize = F, margin=m)
 ```
 
 ## Os albuns relançados/remasterizados são mais populares? 
@@ -206,8 +215,78 @@ p <- data %>%
         geom_point() +
         theme(axis.title.y=element_blank())
 
-ggplotly(p) %>%
+ggplotly(p,tooltip=NA) %>%
   layout(autosize = F,
          margin = m)
 ```
+
+## De Qual nota são as faixas mais populares?
+
+
+```{r}
+# tim12equal = c("#00008F", "#0000EA", "#0047FF", "#00A2FF", "#00FEFF", "#5AFFA5", "#B5FF4A", "#FFED00", "#FF9200", "#FF3700", "#DB0000", "#800000")
+# 
+# m <- list(
+#     b = 70);
+# 
+# p <- 
+#  data %>%
+#     select(key,album_release_date) %>%
+#     group_by(album_release_date,key) %>%
+#     summarise(count = n()) %>%
+#     mutate(prop = count/sum(count)) %>%
+#     ungroup() %>%
+#     ggplot(aes(x = factor(album_release_date), y = count, fill = key)) +
+#     geom_bar(stat = "identity", position = "fill", width = .7)  +
+#     scale_y_continuous(labels = scales::percent) +
+#     scale_fill_manual(values = tim12equal) +
+#     theme(axis.text.x = element_text(angle = 30, hjust = 1)) + 
+#     ggtitle("Distribuição de notas musicais temporalmente")
+# 
+# 
+# ggplotly(p) %>%
+#       layout(autosize = F,
+#              margin = m)
+```
+
+
+
+
+```{r}
+tim12equal = c("#00008F", "#0000EA", "#0047FF", "#00A2FF", "#00FEFF", "#5AFFA5", "#B5FF4A", "#FFED00", "#FF9200", "#FF3700", "#DB0000", "#800000")
+
+
+m <- list(
+    l=80,
+    r=30);
+
+p <-  data %>%
+    select(key,album_release_date, remaster) %>%
+    group_by(album_release_date,key,remaster) %>%
+    summarise(count = n()) %>%
+    mutate(prop = count/sum(count)) %>%
+    ungroup() %>%
+    ggplot(aes(x = factor(album_release_date), y = count, fill = key)) +
+    geom_bar(stat = "identity", position = "fill", width = .7)  +
+    scale_y_continuous(labels = scales::percent) +
+    scale_fill_manual(values = tim12equal) +
+    theme(axis.text.x = element_text(angle = 30, hjust = 1))  +
+    theme(axis.title.x=element_blank(),
+          axis.title.y=element_blank()) +
+    facet_grid(remaster ~ .) +
+    ggtitle("Notas musicais (distinção por remasterização)") +
+    guides(fill=guide_legend(title=""))
+
+ggplotly(p) %>%
+      layout(autosize = F,
+             margin = m,
+             legend = list(
+      orientation = "h", y =-0.2
+    ))
+
+```
+
+É possível ver que no começo dos anos 1960 ínicio as músicas na escala entre E e G dominam fortemente o repertório de Jackson, curiosamente quando as músicas de notas entre A e C chegam a ocupar metade das ocorrências. Isso está de acordo com o perfil de Jackson, notório por sua heterogeneidade.
+
+
 
