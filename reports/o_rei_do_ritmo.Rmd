@@ -69,7 +69,7 @@ data %>%
     glimpse()
 ```
 
-### Dançabilidade (danceability)
+### Danceability
 
 ```{r}
 data %>% 
@@ -80,12 +80,12 @@ data %>%
 ```{r}
 hchart (data$danceability,
         color = "#B71C1C",
-        name = "Dançabilidade")
+        name = "Danceability")
 ```
 
-* Nenhum valor fora do domínio dos valores, a dançabilidade parece girar em torno de 0.6 e 0.7.
+* No value outside expected domain, danceability seems to vary around 0.6 and 0.7.
 
-### Verbosidade (speechines)
+### Speechiness
 
 ```{r}
 data %>% 
@@ -96,12 +96,12 @@ data %>%
 ```{r}
 hchart (data$speechiness,
         color = "#B71C1C",
-        name = "Verbosidade")
+        name = "Speechiness")
 ```
 
-* Nenhum valor fora do domínio dos valores. A verbosidade é em geral baixa, observando a música de Jackson o ritmo parece ser a questão principal, com letras curtas e quase repetitivas.
+* No value outside expected domain. Speechiness is overall small. Observing Jackson's music rithm seems to be its trademark,  with short and almost repetitive lyrics.
 
-### Duração (duration)
+### Duration
 
 ```{r}
 data <- data %>%
@@ -122,20 +122,19 @@ data %>%
 ```{r}
 hchart (data$duration_s,
         color = "#B71C1C",
-        name = "Duração (s)")
+        name = "Duration (s)")
 ```
 
-* Nenhum valor fora do domínio dos valores. As músicas giram em torno de 160 segundos (2 minutos e 40 segundos), as músicas de Jackson são em geral curtas.
+* No value outside expected domain. Songs on average last 160 seconds (2 minutes and 40 seconds), Jackson's songs are overall very short.
 
-### Remasterização (remaster)
-
+### Remastered
 
 ```{r}
 data <- data %>%
-    mutate(remaster = album_release_date > "1981-30-12")
+    mutate(remastered = album_release_date > "1981-30-12")
 
 data %>% 
-    select(album_name, album_release_year, remaster) %>%
+    select(album_name, album_release_year, remastered) %>%
     sample_n(10)
 ```
 
@@ -144,22 +143,22 @@ data %>%
 temp <- data %>% 
     distinct(album_name,
              .keep_all = TRUE) %>%
-    mutate(remaster = ifelse(remaster == TRUE,"remasterizado","original"))
+    mutate(remastered = ifelse(remastered == TRUE,"remastered","original"))
 
-hchart(temp$remaster,
+hchart(temp$remastered,
        colorByPoint = TRUE,
        name="Álbum")
 ```
 
-* Álbuns remasterizados/relançados são muito mais frequentes.
+* Remastered/Relaunched albums are very frequent.
 
 ```{r}
 temp <-
     data %>% 
     distinct(album_name, .keep_all = TRUE) %>%
     group_by(album_release_year) %>%
-    summarise(original_n = sum(!remaster),
-              remaster_n = sum(remaster))
+    summarise(original_n = sum(!remastered),
+              remastered_n = sum(remastered))
 
 highchart() %>%
 
@@ -167,17 +166,17 @@ highchart() %>%
   hc_add_series(temp$original_n, 
                 type = "column",
                 color = "#B71C1C",
-                name = "Não remasterizado") %>%
-  hc_add_series(temp$remaster_n, 
+                name = "Not remastered") %>%
+  hc_add_series(temp$remastered_n, 
                 type = "column",
-                name = "Remasterizado")  %>%
-      hc_title(text = "Número de álbuns por ano")
+                name = "Remastered")  %>%
+      hc_title(text = "Number of albums per year")
 
 ```
 
-* O ano de 2016 representa um aumento altíssimo na disponibilização de álbuns de Jackson no Spotify. 
+* On 2016 we have a huge increase on the provision of Jackson's albums on Spotify.
 
-## Mais discurso/diálogo (speechines) tem efeito sobre a dançabilidade da música?
+## More dialog/vocals (speechines) impacts the danceability of the song?
 
 ```{r}
 p <- data %>% 
@@ -191,9 +190,8 @@ ggplotly(p)
 
 <br></br>
 
-Não parece haver uma relação clara entre a dançabilidade das músicas de Jackson e a verbosidade de suas músicas. Temos muitas faixas de diferente grau de dançabilidade de mesmo grau baixo de verbosidade.  
-Quando aumentamos a verbosidade das músicas (mais à direita no eixo) a dançabilidade se mantém relativamente estável (O aumento na dançabilidade é marginal).  
-
+There doesn't seem to be a clear relation between the danceability of Jackson's songs and their speechiness. We have many tracks of different levels of danceability and on the same low level of speechiness. 
+When we increase the speechiness of the songs (more to the right of the x axis) the danceability stays relatively stable (The increase in danceability is marginal).
 
 ```{r}
 data %>% 
@@ -206,13 +204,13 @@ data %>%
 
 <br></br>
 
-É possível ver mais claramente que o ponto de maior ocorrência (cume ou ponto de level mais alto) é em em torno de 0.7 de dançabilidade e de aproximadamente 0.04 (valores muito baixo de verbosidade).   
-Isso implica em algo já esperado, Jackson não precisa falar muito pra tornar suas músicas dançantes, não é a toa que Jackson ganhou a alcunha de Rei do Ritmo. 
+It's possible to see more clearly that point of higher occurrences (area of highest level) is around 0.7 of danceability and 0.04 of speechiness (a very low level of speechiness). 
+This implies something we expected, Jackson doesn't need to talk much to make their songs highly danceable, it's for good reason that Jackson was nicknamed **the king of rithm**.
 
-* O aumento em verbosidade não parece afetar significativamente a dançabilidade.
-* Verbosidade não seria a real razão da significativa dançabilidade das músicas de Jackson, o qual é notório pela batida e ritmo de suas músicas (tendo sido nomeado até maior ritmista da história da música popular brasileira).     
+* The increase in speechiness doesn't seem to affect danceability significantly.
+* Speechiness wouldn't be the actual reason for the considerably danceability of Jackson's music, who's notorious for the beat and rithm of his songs (who was even named the best percussionist of the popular brazilian music). 
 
-## Como o passar dos anos afeta o tempo de duração da música?
+## How the years affect the length of the tracks?
 
 ```{r}
 m <- list(
@@ -223,15 +221,16 @@ p <- data %>%
     ggplot(aes(x=as.factor(album_release_year),
                duration_s,
                group=album_release_year,
-               color=remaster)) +
+               color=remastered)) +
     geom_boxplot(position = "dodge", alpha=0.6) +
-    theme(axis.text.x = element_text(angle = 30, hjust = 1))
+    theme(axis.text.x = element_text(angle = 30, hjust = 1)) +
+    labs(x="Album release year", y="Track duration (s)")
 
 ggplotly(p) %>%
      layout(autosize = F, margin=m)
 ```
 
-Olhando para os álbuns originais (remaster = FALSE) é possível perceber um grande aumento no tempo de duração das músicas no álbum em 1967 seguido de uma diminuição no álbum seguinte 1968. Esse choque no perfil dos dois álbuns requer uma explicação que não está nos dados.
+Olhando para os álbuns originais (remastered = FALSE) é possível perceber um grande aumento no tempo de duração das músicas no álbum em 1967 seguido de uma diminuição no álbum seguinte 1968. Esse choque no perfil dos dois álbuns requer uma explicação que não está nos dados.
 
 O álbum de 1967 **A Braza do Norte**, primeiro gravado na gravadora Cantagalo marca também um momento especial na vida do cantor, pois esse é o ano de seu divórcio de Almira, parceira na música e esposa. De músicas mais longas e de faixas de letra mais triste como **"Passarinho abandonado"** composta pelo próprio Jackson, esse perfil incomum do álbum acaba por refletir esse momento da vida do cantor.
 
@@ -248,14 +247,13 @@ m <- list(
   l = 370)
 
 p <- data %>%
-        ggplot(aes(album_popularity,y=reorder(album_name,album_popularity),
-                   color=remaster,
-                   group=remaster)) +
-            geom_segment(aes(x = 0, y = reorder(album_name,album_popularity), 
-                             xend = album_popularity, 
-                             yend = album_name)) + 
-        geom_point() +
-        theme(axis.title.y=element_blank())
+    ggplot(aes(album_popularity,y=reorder(album_name,album_popularity),
+               group=remastered)) +
+    geom_segment(aes(x = 0, y = reorder(album_name,album_popularity),
+                     xend = album_popularity, yend = album_name)) +
+    geom_point(aes(color=remastered)) +
+    theme(axis.title.y=element_blank()) +
+    scale_color_discrete(" Remastered")
 
 ggplotly(p,tooltip=NA) %>%
   layout(autosize = F,
@@ -272,35 +270,40 @@ tim12equal = c("#00008F", "#0000EA", "#0047FF", "#00A2FF", "#00FEFF", "#5AFFA5",
 
 
 m <- list(
-    l=80,
-    r=30);
+    l=45,
+    r=40);
 
 p <-  data %>%
-    select(key,album_release_date, remaster) %>%
-    group_by(album_release_date,key,remaster) %>%
-    summarise(count = n()) %>%
-    mutate(prop = count/sum(count)) %>%
+    select(key,album_release_date, remastered) %>%
+    group_by(album_release_date,key,remastered) %>%
+    summarise(counted = n()) %>%
     ungroup() %>%
-    ggplot(aes(x = factor(album_release_date), 
-               y = count, fill = key,
+    group_by(album_release_date) %>%
+    mutate(rel_freq = counted/sum(counted)) %>%
+    ggplot(aes(x = factor(album_release_date),
+               y = rel_freq,
+               fill = factor(key),
                text = paste(
-                    "Proporção:", count * 10,"%"
-                     ))) +
-    geom_bar(stat = "identity", position = "fill", width = .7)  +
+                    "Proportion:",
+                    round(rel_freq * 100,2),"%"))) +
+    geom_col() +
     scale_y_continuous(labels = scales::percent) +
     scale_fill_manual(values = tim12equal) +
     theme(axis.text.x = element_text(angle = 30, hjust = 1))  +
     theme(axis.title.x=element_blank(),
           axis.title.y=element_blank()) +
-    facet_grid(remaster ~ .) +
+    facet_wrap(remastered ~ ., nrow = 2) +
     ggtitle("Notas musicais (distinção por remasterização)") +
-    guides(fill=guide_legend(title=""))
+    guides(fill=guide_legend(title="Musical\nNotes")) 
 
 ggplotly(p, tooltip="text") %>%
       layout(autosize = F,
              margin = m,
              legend = list(
       orientation = "h", y =-0.2
+    )) %>%
+    layout(legend = list(
+      orientation = "v"
     ))
 
 ```
