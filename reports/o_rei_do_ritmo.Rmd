@@ -2,12 +2,13 @@
 title: "Jackson do Pandeiro - The king of rithm"
 subtitle: 'Analysis with interactive visualizations about Jackson do Pandeiro on data from Spotify'
 author: "José Benardi de Souza Nunes"
+date: '29/05/2018'
 output:
-  html_notebook:
-    toc: yes
-    toc_float: yes
   html_document:
     df_print: paged
+    toc: yes
+    toc_float: yes
+  html_notebook:
     toc: yes
     toc_float: yes
 ---
@@ -20,14 +21,14 @@ output:
 
 ## Employed dataset
 
-Exploratory data analysis on data from [Spotify](https://www.spotify.com/br/) about the albums and musics of Jackson do Pandeiro. The original data come from [this repository](https://github.com/cienciadedados-ufcg/vis-cancoes). The explanation about how the data were generatedis available [at the Spotify API documentation](https://beta.developer.spotify.com/documentation/web-api/reference/object-model/#audio-features-object).
+Exploratory data analysis on data from [Spotify](https://www.spotify.com/br/) about the albums and musics of Jackson do Pandeiro. The original data come from [this repository](https://github.com/cienciadedados-ufcg/vis-cancoes). The explanation about how the data were generated is available [at the Spotify API documentation](https://beta.developer.spotify.com/documentation/web-api/reference/object-model/#audio-features-object).
 
 ### Considerations
 
 In the analysis below we could:
 
-* See how speech was not the real core of dancability of Jackson's songs, which was to be expected from the **King of rithm**.
-* See how on Spotify most albums are remastered/relaunched and those are the most popular.
+* See how speech was not the real core of danceability of Jackson's songs, which was to be expected from the **King of rithm**.
+* See how on Spotify most albums are remastered/rereleased and those are the most popular.
 * Glimpse the incredible diversity of the singer which was reaffirmed in terms of musical notes and length.
 * Realize how tone and track duration of Jackson's songs do not only represent the incredible diversity of his music, but also represent his private life. An event in his private life impacts sensibly the tone of his music. 
 
@@ -150,7 +151,7 @@ hchart(temp$remastered,
        name="Álbum")
 ```
 
-* Remastered/Relaunched albums are very frequent.
+* Remastered/Re-released albums are very frequent.
 
 ```{r}
 temp <-
@@ -208,7 +209,7 @@ It's possible to see more clearly that point of higher occurrences (area of high
 This implies something we expected, Jackson doesn't need to talk much to make their songs highly danceable, it's for good reason that Jackson was nicknamed **the king of rithm**.
 
 * The increase in speechiness doesn't seem to affect danceability significantly.
-* Speechiness wouldn't be the actual reason for the considerably danceability of Jackson's music, who's notorious for the beat and rithm of his songs (who was even named the best percussionist of the popular brazilian music). 
+* Speechiness wouldn't be the actual reason for the considerably danceability of Jackson's music, who's notorious for the beat and rithm of his songs (who was even named the best percussionist of the popular Brazilian music). 
 
 ## How the years affect the length of the tracks?
 
@@ -230,16 +231,15 @@ ggplotly(p) %>%
      layout(autosize = F, margin=m)
 ```
 
-Olhando para os álbuns originais (remastered = FALSE) é possível perceber um grande aumento no tempo de duração das músicas no álbum em 1967 seguido de uma diminuição no álbum seguinte 1968. Esse choque no perfil dos dois álbuns requer uma explicação que não está nos dados.
+Looking at the original albums (remastered = FALSE) it's possible to notice a great increase in the duration time of the album tracks at 1967 followed by a decrease at the next album at 1968. This difference in the profile of the two albums requires an explanation that the data by itself can't provide.  
 
-O álbum de 1967 **A Braza do Norte**, primeiro gravado na gravadora Cantagalo marca também um momento especial na vida do cantor, pois esse é o ano de seu divórcio de Almira, parceira na música e esposa. De músicas mais longas e de faixas de letra mais triste como **"Passarinho abandonado"** composta pelo próprio Jackson, esse perfil incomum do álbum acaba por refletir esse momento da vida do cantor.
+The 1967 album **A Braza do Norte**, first recorded by the record company Cantagalo marks as well a special moment in the life of the singer, for it's the year of his divorce from Almira, who was not only his wife but also partner in music. With longer and melancholic lyrics such as **"Passarinho abandonado"** composed by Jackson himself, the unusual profile of the album end ups reflecting this moment in the life of the singer.  
 
-O álbum de 1968 por outro lado é uma coletânea e reúne algumas das músicas até então mais populares (e tambpem curtas do cantor). Essa coletânea casa com um inaudito porém curto hiato do cantor que pela primeira vez passa um ano sem publicar um álbum, o qual pode ser atribuído ao seu divórcio.
+The 1968 album on the other hand is a compilation album which pieces together some of the Jackson's most popular tracks up to that point (which happen to be short). This compilation album also matches the unprecedented but short hiatus in the singer's career, who for the first time passes an entire year without releasing an album, most likely in reason of his recent divorce.  
 
-* Os álbuns remasterizados/relançados reúnem faixas algumas vezes de diferentes momentos da carreira do cantor, e por isso fica difícil atribuir um significado pertinente à duração de suas faixas. 
+* The remastered/re-released albums sometimes gather tracks of different moments in the career of the singer, and for that reason it's hard to attribute a significant meaning to the length of the  tracks.
 
-
-## Os albuns relançados/remasterizados são mais populares? 
+## Are the remastered/rereleased more popular?
 
 ```{r}
 # lollipop chart
@@ -253,17 +253,17 @@ p <- data %>%
                      xend = album_popularity, yend = album_name)) +
     geom_point(aes(color=remastered)) +
     theme(axis.title.y=element_blank()) +
-    scale_color_discrete(" Remastered")
+    scale_color_discrete(" Remastered") +
+    labs(x="Album popularity")
 
 ggplotly(p,tooltip=NA) %>%
   layout(autosize = F,
          margin = m)
 ```
 
-Fica evidente que para Jackson do Pandeiro **os álbuns remasterizados/relançados dominam o cenário do Spotify em termos de popularidade**. 
-Primeiramente, simplesmente observando a proporção entre remasterizados e não remasterizados fica evidente que os primeiros são os que o Spotify mais disponibiliza. Segundo, levando em consideração a questão de qualidade de áudio era de se esperar que os remasterizados tomassem a dianteira.
+It's clear that for Jackson do Pandeiro **the remastered/rereleased albums dominate Spotify in terms of popularity**. First, by simply observing the proportion between remastered and non remastered it becomes obvious that the first ones are the ones Spotify provides the most. Secondly, taking in consideration the matter of audio quality it was to be expected that the remastered ones would be more popular.
 
-## Como o tempo afeta a distribuição das notas musicais ?
+## How does the years affect the distribution of musical notes?
 
 ```{r}
 tim12equal = c("#00008F", "#0000EA", "#0047FF", "#00A2FF", "#00FEFF", "#5AFFA5", "#B5FF4A", "#FFED00", "#FF9200", "#FF3700", "#DB0000", "#800000")
@@ -293,8 +293,8 @@ p <-  data %>%
     theme(axis.title.x=element_blank(),
           axis.title.y=element_blank()) +
     facet_wrap(remastered ~ ., nrow = 2) +
-    ggtitle("Notas musicais (distinção por remasterização)") +
-    guides(fill=guide_legend(title="Musical\nNotes")) 
+    ggtitle("Musical Notes (distinction by remaster)") +
+    guides(fill=guide_legend(title="")) 
 
 ggplotly(p, tooltip="text") %>%
       layout(autosize = F,
@@ -308,7 +308,7 @@ ggplotly(p, tooltip="text") %>%
 
 ```
 
-* É possível ver que no começo dos anos 1960 ínicio as músicas na escala entre E e G dominam fortemente o repertório de Jackson, curiosamente quando as músicas de notas entre A e C chegam a ocupar metade das ocorrências.   
-    + Isso está de acordo com o perfil de Jackson, notório por sua heterogeneidade, além disso o álbum de 1967 como foi dito anteriormente representa uma mudança no tom do cantor também por motivos pessoais (seu divórcio).  
- * Os álbuns remasterizados refletem uma grande variação em termos de notas musicais já esperada dado que esse conjuto reúne uma quase caótica série de coletâneas, seleções diversas e relançamentos que acabam misturando momentos diferentes da carreira do cantor.  
-    + O fato de Jackson se entregar a diversos estilos musicais śo multiplica essa variação em termos de notas musicais (Jackson se envolveu com baião, xote, xaxado, coco, arrastapé, quadrilha, marcha, frevo, **e outros**), isso fica evidente na variação já nos álbuns não remasterizados.
+* We can see that at the beginning of the 1960s  the songs on the scale between E and G dominated strongly Jackson's repertoire, curiously when we reach the end of the decade the musical notes between A and C come to occupy half of the releases.
+    + This is in accordance to Jackson's profile, notorious for his heterogeneity, besides the 1967 album as said before represents a shift in the note of the singer for matters in his private life (divorce).
+* The remastered albums show a big variation in terms of musical notes, which was expected as the set pieces together a near chaotic series of compilations, selections and re-releases which end up mixing different moments of the singer's career.
+    + The fact that Jackson delves into many distinct musical styles only multiplies this variation in musical notes (Jacks played, sang and composed baião, xote, xaxado, coco, arrastapé, quadrilha, marcha, frevo, **and others**), this becomes apparent already in the non remastered albums.
