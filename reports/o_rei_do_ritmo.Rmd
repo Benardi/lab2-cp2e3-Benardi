@@ -1,18 +1,31 @@
 ---
-title: "EDA VIS canções"
-subtitle: 'Análise sobre Jackson do Pandeiro'
+title: "Jackson - O rei do Ritmo"
+subtitle: 'Análise sobre Jackson do Pandeiro (Spotify)'
 author: "José Benardi de Souza Nunes"
 output:
-  html_notebook:
-    toc: yes
-    toc_float: yes
   html_document:
     df_print: paged
     toc: yes
     toc_float: yes
+  html_notebook:
+    toc: yes
+    toc_float: yes
 ---
 
-```{r}
+## Conjunto de dados utilizado
+
+Análise exploratória de dados do [Spotify](https://www.spotify.com/br/)  sobre os álbuns e músicas de Jackson do Pandeiro Streaming. Os dados originais e as variáveis vêm [deste repositorio](https://github.com/cienciadedados-ufcg/vis-cancoes) . A explicação de como os dados foram gerados está disponível [na documentação da API do Spotify](https://beta.developer.spotify.com/documentation/web-api/reference/object-model/#audio-features-object).
+
+### Considerações
+
+Na análise abaixo foi possível perceber:
+
+* Como a fala não é a grande questão na dançabilidade das músicas de Jackson, o que era de se esperar do **Rei do Ritmo**. 
+* Vimos como no Spotify a maior parte dos álbuns são remasterizados/relançados e estes  são os mais populares. 
+* Foi possível vislumbrar a incrível diversidade do cantor que nos foi reafirmada em termos de notas musicais e de duração.
+* Por fim, foi possível perceber como o tom e mesmo a duração das faixas de Jackson não representam somente a incrível diversidade de sua música, mas também refletem sua vida pessoal. Um evento de natureza pessoal afeta visivelmente o tom de sua música.
+
+```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
 library(tidyverse)
 library(dplyr, warn.conflicts = FALSE)
 library(here)
@@ -50,7 +63,7 @@ data %>%
     glimpse()
 ```
 
-### Danceability
+### Dançabilidade (danceability)
 
 ```{r}
 data %>% 
@@ -64,8 +77,9 @@ hchart (data$danceability,
         name = "Dançabilidade")
 ```
 
+* Nenhum valor fora do domínio dos valores, a dançabilidade parece girar em torno de 0.6 e 0.7.
 
-### Speechines
+### Verbosidade (speechines)
 
 ```{r}
 data %>% 
@@ -79,7 +93,9 @@ hchart (data$speechiness,
         name = "Verbosidade")
 ```
 
-### Duration
+* Nenhum valor fora do domínio dos valores. A verbosidade é em geral baixa, observando a música de Jackson o ritmo parece ser a questão principal, com letras curtas e quase repetitivas.
+
+### Duração (duration)
 
 ```{r}
 data <- data %>%
@@ -103,9 +119,10 @@ hchart (data$duration_s,
         name = "Duração (s)")
 ```
 
-### Remaster
+* Nenhum valor fora do domínio dos valores. As músicas giram em torno de 160 segundos (2 minutos e 40 segundos), as músicas de Jackson são em geral curtas.
 
-Ultimo album "1981: Isso é que é Forró!"
+### Remasterização (remaster)
+
 
 ```{r}
 data <- data %>%
@@ -128,36 +145,7 @@ hchart(temp$remaster,
        name="Álbum")
 ```
 
-
-
-## Mais discurso/diálogo (speechines) tem efeito sobre a dançabilidade da música?
-
-```{r}
-p <- data %>% 
-        distinct(track_name, .keep_all = TRUE) %>%
-        ggplot(aes(x=speechiness,
-                   y=danceability)) +
-        geom_point(alpha=0.4) 
-
-ggplotly(p)
-```
-
-A dançabilidade das músicas de Jackson
-
-```{r}
-data %>% 
-    distinct(track_name, .keep_all = TRUE) %>%
-    ggplot(aes(speechiness,danceability)) +
-    stat_density2d(aes(fill = ..level..), geom = "polygon")
-```
-
-```{r}
-data %>%
-    group_by(track_name) %>%
-    top_n(10, speechiness)
-```
-
-## Como o passar dos anos afeta o tempo de duração da música?
+* Álbuns remasterizados/relançados são muito mais frequentes.
 
 ```{r}
 temp <-
@@ -181,6 +169,45 @@ highchart() %>%
 
 ```
 
+* O ano de 2016 representa um aumento altíssimo na disponibilização de álbuns de Jackson no Spotify. 
+
+## Mais discurso/diálogo (speechines) tem efeito sobre a dançabilidade da música?
+
+```{r}
+p <- data %>% 
+        distinct(track_name, .keep_all = TRUE) %>%
+        ggplot(aes(x=speechiness,
+                   y=danceability)) +
+        geom_point(alpha=0.4) 
+
+ggplotly(p)
+```
+
+<br></br>
+
+Não parece haver uma relação clara entre a dançabilidade das músicas de Jackson e a verbosidade de suas músicas. Temos muitas faixas de diferente grau de dançabilidade de mesmo grau baixo de verbosidade.  
+Quando aumentamos a verbosidade das músicas (mais à direita no eixo) a dançabilidade se mantém relativamente estável (O aumento na dançabilidade é marginal).  
+
+
+```{r}
+data %>% 
+    distinct(track_name, .keep_all = TRUE) %>%
+    ggplot(aes(speechiness,danceability)) +
+    stat_density2d(aes(fill = ..level..), geom = "polygon") +
+    scale_x_continuous(breaks = seq(0,1,0.01))
+
+```
+
+<br></br>
+
+É possível ver mais claramente que o ponto de maior ocorrência (cume ou ponto de level mais alto) é em em torno de 0.7 de dançabilidade e de aproximadamente 0.04 (valores muito baixo de verbosidade).   
+Isso implica em algo já esperado, Jackson não precisa falar muito pra tornar suas músicas dançantes, não é a toa que Jackson ganhou a alcunha de Rei do Ritmo. 
+
+* O aumento em verbosidade não parece afetar significativamente a dançabilidade.
+* Verbosidade não seria a real razão da significativa dançabilidade das músicas de Jackson, o qual é notório pela batida e ritmo de suas músicas (tendo sido nomeado até maior ritmista da história da música popular brasileira).     
+
+## Como o passar dos anos afeta o tempo de duração da música?
+
 ```{r}
 m <- list(
   l =70,
@@ -197,6 +224,15 @@ p <- data %>%
 ggplotly(p) %>%
      layout(autosize = F, margin=m)
 ```
+
+Olhando para os álbuns originais (remaster = FALSE) é possível perceber um grande aumento no tempo de duração das músicas no álbum em 1967 seguido de uma diminuição no álbum seguinte 1968. Esse choque no perfil dos dois álbuns requer uma explicação que não está nos dados.
+
+O álbum de 1967 **A Braza do Norte**, primeiro gravado na gravadora Cantagalo marca também um momento especial na vida do cantor, pois esse é o ano de seu divórcio de Almira, parceira na música e esposa. De músicas mais longas e de faixas de letra mais triste como **"Passarinho abandonado"** composta pelo próprio Jackson, esse perfil incomum do álbum acaba por refletir esse momento da vida do cantor.
+
+O álbum de 1968 por outro lado é uma coletânea e reúne algumas das músicas até então mais populares (e tambpem curtas do cantor). Essa coletânea casa com um inaudito porém curto hiato do cantor que pela primeira vez passa um ano sem publicar um álbum, o qual pode ser atribuído ao seu divórcio.
+
+* Os álbuns remasterizados/relançados reúnem faixas algumas vezes de diferentes momentos da carreira do cantor, e por isso fica difícil atribuir um significado pertinente à duração de suas faixas. 
+
 
 ## Os albuns relançados/remasterizados são mais populares? 
 
@@ -220,37 +256,10 @@ ggplotly(p,tooltip=NA) %>%
          margin = m)
 ```
 
-## De Qual nota são as faixas mais populares?
+Fica evidente que para Jackson do Pandeiro **os álbuns remasterizados/relançados dominam o cenário do Spotify em termos de popularidade**. 
+Primeiramente, simplesmente observando a proporção entre remasterizados e não remasterizados fica evidente que os primeiros são os que o Spotify mais disponibiliza. Segundo, levando em consideração a questão de qualidade de áudio era de se esperar que os remasterizados tomassem a dianteira.
 
-
-```{r}
-# tim12equal = c("#00008F", "#0000EA", "#0047FF", "#00A2FF", "#00FEFF", "#5AFFA5", "#B5FF4A", "#FFED00", "#FF9200", "#FF3700", "#DB0000", "#800000")
-# 
-# m <- list(
-#     b = 70);
-# 
-# p <- 
-#  data %>%
-#     select(key,album_release_date) %>%
-#     group_by(album_release_date,key) %>%
-#     summarise(count = n()) %>%
-#     mutate(prop = count/sum(count)) %>%
-#     ungroup() %>%
-#     ggplot(aes(x = factor(album_release_date), y = count, fill = key)) +
-#     geom_bar(stat = "identity", position = "fill", width = .7)  +
-#     scale_y_continuous(labels = scales::percent) +
-#     scale_fill_manual(values = tim12equal) +
-#     theme(axis.text.x = element_text(angle = 30, hjust = 1)) + 
-#     ggtitle("Distribuição de notas musicais temporalmente")
-# 
-# 
-# ggplotly(p) %>%
-#       layout(autosize = F,
-#              margin = m)
-```
-
-
-
+## Como o tempo afeta a distribuição das notas musicais ?
 
 ```{r}
 tim12equal = c("#00008F", "#0000EA", "#0047FF", "#00A2FF", "#00FEFF", "#5AFFA5", "#B5FF4A", "#FFED00", "#FF9200", "#FF3700", "#DB0000", "#800000")
@@ -266,7 +275,11 @@ p <-  data %>%
     summarise(count = n()) %>%
     mutate(prop = count/sum(count)) %>%
     ungroup() %>%
-    ggplot(aes(x = factor(album_release_date), y = count, fill = key)) +
+    ggplot(aes(x = factor(album_release_date), 
+               y = count, fill = key,
+               text = paste(
+                    "Proporção:", count * 10,"%"
+                     ))) +
     geom_bar(stat = "identity", position = "fill", width = .7)  +
     scale_y_continuous(labels = scales::percent) +
     scale_fill_manual(values = tim12equal) +
@@ -277,7 +290,7 @@ p <-  data %>%
     ggtitle("Notas musicais (distinção por remasterização)") +
     guides(fill=guide_legend(title=""))
 
-ggplotly(p) %>%
+ggplotly(p, tooltip="text") %>%
       layout(autosize = F,
              margin = m,
              legend = list(
@@ -286,7 +299,7 @@ ggplotly(p) %>%
 
 ```
 
-É possível ver que no começo dos anos 1960 ínicio as músicas na escala entre E e G dominam fortemente o repertório de Jackson, curiosamente quando as músicas de notas entre A e C chegam a ocupar metade das ocorrências. Isso está de acordo com o perfil de Jackson, notório por sua heterogeneidade.
-
-
-
+* É possível ver que no começo dos anos 1960 ínicio as músicas na escala entre E e G dominam fortemente o repertório de Jackson, curiosamente quando as músicas de notas entre A e C chegam a ocupar metade das ocorrências.   
+    + Isso está de acordo com o perfil de Jackson, notório por sua heterogeneidade, além disso o álbum de 1967 como foi dito anteriormente representa uma mudança no tom do cantor também por motivos pessoais (seu divórcio).  
+ * Os álbuns remasterizados refletem uma grande variação em termos de notas musicais já esperada dado que esse conjuto reúne uma quase caótica série de coletâneas, seleções diversas e relançamentos que acabam misturando momentos diferentes da carreira do cantor.  
+    + O fato de Jackson se entregar a diversos estilos musicais śo multiplica essa variação em termos de notas musicais (Jackson se envolveu com baião, xote, xaxado, coco, arrastapé, quadrilha, marcha, frevo, **e outros**), isso fica evidente na variação já nos álbuns não remasterizados.
