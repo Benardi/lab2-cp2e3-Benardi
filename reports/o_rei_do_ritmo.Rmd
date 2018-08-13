@@ -1,29 +1,35 @@
 ---
-title: "Jackson - O rei do Ritmo"
-subtitle: 'Análise sobre Jackson do Pandeiro (Spotify)'
+title: "Jackson do Pandeiro - The king of rithm"
+subtitle: 'Analysis with interactive visualizations about Jackson do Pandeiro on data from Spotify'
 author: "José Benardi de Souza Nunes"
 output:
+  html_notebook:
+    toc: yes
+    toc_float: yes
   html_document:
     df_print: paged
     toc: yes
     toc_float: yes
-  html_notebook:
-    toc: yes
-    toc_float: yes
 ---
 
-## Conjunto de dados utilizado
+<br>
 
-Análise exploratória de dados do [Spotify](https://www.spotify.com/br/)  sobre os álbuns e músicas de Jackson do Pandeiro Streaming. Os dados originais e as variáveis vêm [deste repositorio](https://github.com/cienciadedados-ufcg/vis-cancoes) . A explicação de como os dados foram gerados está disponível [na documentação da API do Spotify](https://beta.developer.spotify.com/documentation/web-api/reference/object-model/#audio-features-object).
+***
 
-### Considerações
+<br>
 
-Na análise abaixo foi possível perceber:
+## Employed dataset
 
-* Como a fala não é a grande questão na dançabilidade das músicas de Jackson, o que era de se esperar do **Rei do Ritmo**. 
-* Vimos como no Spotify a maior parte dos álbuns são remasterizados/relançados e estes  são os mais populares. 
-* Foi possível vislumbrar a incrível diversidade do cantor que nos foi reafirmada em termos de notas musicais e de duração.
-* Por fim, foi possível perceber como o tom e mesmo a duração das faixas de Jackson não representam somente a incrível diversidade de sua música, mas também refletem sua vida pessoal. Um evento de natureza pessoal afeta visivelmente o tom de sua música.
+Exploratory data analysis on data from [Spotify](https://www.spotify.com/br/) about the albums and musics of Jackson do Pandeiro. The original data come from [this repository](https://github.com/cienciadedados-ufcg/vis-cancoes). The explanation about how the data were generatedis available [at the Spotify API documentation](https://beta.developer.spotify.com/documentation/web-api/reference/object-model/#audio-features-object).
+
+### Considerations
+
+In the analysis below we could:
+
+* See how speech was not the real core of dancability of Jackson's songs, which was to be expected from the **King of rithm**.
+* See how on Spotify most albums are remastered/relaunched and those are the most popular.
+* Glimpse the incredible diversity of the singer which was reaffirmed in terms of musical notes and length.
+* Realize how tone and track duration of Jackson's songs do not only represent the incredible diversity of his music, but also represent his private life. An event in his private life impacts sensibly the tone of his music. 
 
 ```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
 library(tidyverse)
